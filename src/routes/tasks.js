@@ -1,6 +1,7 @@
 const express = require('express')
 const Task = require('../models/task')
 const User = require('../models/user')
+const Appointment = require('../models/appointment')
 
 const tasksRouter = express.Router()
 const bodyParser = require('body-parser')
@@ -43,7 +44,7 @@ tasksRouter.post('/create', function (req, res, next) {
     })
 })
 
-tasksRouter.use('/:id', function (req, res, next) {
+tasksRouter.get('/:id', function (req, res, next) {
   var userId = req.session.userId || req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page' })
@@ -97,6 +98,57 @@ tasksRouter.get('/', function (req, res, next) {
           return res.status(404).json({ 'error': 'No tasks' })
         }
         return res.status(200).json(docs)
+      })
+    })
+})
+
+tasksRouter.delete('/:id', function (req, res, next) {
+  var userId = req.session.userId || req.headers.token
+  if (userId === null || userId === 'null' || userId === '') {
+    return res.status(401).json({ error: 'Please log in to see this page' })
+  }
+  console.log('UserId: ' + userId)
+  User.findById(userId)
+    .exec(function (error, user) {
+      if (error) {
+        console.log('Error: ', error)
+        return next(error)
+      }
+      if (user === null) {
+        return res.status(401).json({ error: 'Please log in to see this page' })
+      }
+      const id = req.params.id
+      Task.findOne({ userId: userId, _id: id }, function (error, doc) {
+        if (error) {
+          return next(error)
+        }
+        if (doc === null) {
+          console.log('Found: ', doc)
+          return res.status(400).json({ error: 'Task is not found.' })
+        }
+        var taskId = doc._id
+        Appointment.find({ 'taskId': taskId }, function (error, appointments) {
+          if (error) {
+            return next(error)
+          }
+          if (appointments !== null && appointments.length !== 0) {
+            var appointmentIds = []
+            for (var i = 0; i < appointments.length; i++) {
+              appointmentIds.push(appointments[i]._id)
+            }
+            Appointment.remove({ _id: { $in: appointmentIds } }, function (error, doc) {
+              if (error) {
+                return next(error)
+              }
+            })
+          }
+        })
+        Task.remove({ _id: taskId }, function (error, doc) {
+          if (error) {
+            return next(error)
+          }
+          return res.status(204).end()
+        })
       })
     })
 })

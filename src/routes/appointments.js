@@ -44,7 +44,7 @@ appointentsRouter.post('/create', function (req, res, next) {
     })
 })
 
-appointentsRouter.use('/:id', function (req, res, next) {
+appointentsRouter.get('/:id', function (req, res, next) {
   var userId = req.session.userId || req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page' })
@@ -95,7 +95,7 @@ appointentsRouter.get('/', function (req, res, next) {
           return next(error)
         }
         if (tasks === null || tasks.length === 0) {
-          return res.status(404).json({ 'error': 'No tasks' })
+          return res.status(200).json([])
         }
         var taskIds = []
         for (var i = 0; i < tasks.length; i++) {
@@ -106,7 +106,7 @@ appointentsRouter.get('/', function (req, res, next) {
             return next(error)
           }
           if (appointments === null || appointments.length === 0) {
-            return res.status(404).json({ 'error': 'No tasks' })
+            return res.status(200).json([])
           }
           return res.status(200).json(appointments)
         })
@@ -114,4 +114,37 @@ appointentsRouter.get('/', function (req, res, next) {
     })
 })
 
+appointentsRouter.delete('/:id', function (req, res, next) {
+  var userId = req.session.userId || req.headers.token
+  if (userId === null || userId === 'null' || userId === '') {
+    return res.status(401).json({ error: 'Please log in to see this page' })
+  }
+  console.log('UserId: ' + userId)
+  User.findById(userId)
+    .exec(function (error, user) {
+      if (error) {
+        console.log('Error: ', error)
+        return next(error)
+      }
+      if (user === null) {
+        return res.status(401).json({ error: 'Please log in to see this page' })
+      }
+      const id = req.params.id
+      Appointment.findOne({ userId: userId, _id: id }, function (error, doc) {
+        if (error) {
+          return next(error)
+        }
+        if (doc === null) {
+          console.log('Found: ', doc)
+          return res.status(400).json({ error: 'Appointment is not found.' })
+        }
+        Appointment.remove({ _id: doc._id }, function (error, doc) {
+          if (error) {
+            return next(error)
+          }
+          return res.status(204).end()
+        })
+      })
+    })
+})
 module.exports = appointentsRouter

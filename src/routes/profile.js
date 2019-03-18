@@ -9,7 +9,7 @@ const bodyParser = require('body-parser')
 // const jwt = require('jsonwebtoken')
 
 profileRouter.use(bodyParser.json())
-var origins = ['http://localhost:8080', 'http://dermacare.eastus.cloudapp.azure.com:8080']
+var origins = ['http://localhost:8080', 'http://time-tracker.eastus.cloudapp.azure.com:8080']
 profileRouter.use(cors({ origin: origins, credentials: true }))
 
 // const secret = 'mysecretsshhh'
@@ -79,7 +79,7 @@ profileRouter.post('/login', function (req, res, next) {
 
 // GET route after registering
 profileRouter.get('/', function (req, res, next) {
-  var userId = req.session.userId || req.headers.token
+  var userId = req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page' })
   }

@@ -8,11 +8,11 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 tasksRouter.use(bodyParser.json())
-var origins = ['http://localhost:8080']
+var origins = ['http://localhost:8080', 'http://time-tracker.eastus.cloudapp.azure.com:8080']
 tasksRouter.use(cors({ origin: origins, credentials: true }))
 
 tasksRouter.post('/create', function (req, res, next) {
-  var userId = req.session.userId || req.headers.token
+  var userId = req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page' })
   }
@@ -45,7 +45,7 @@ tasksRouter.post('/create', function (req, res, next) {
 })
 
 tasksRouter.get('/:id', function (req, res, next) {
-  var userId = req.session.userId || req.headers.token
+  var userId = req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page' })
   }
@@ -74,7 +74,7 @@ tasksRouter.get('/:id', function (req, res, next) {
 
 tasksRouter.get('/', function (req, res, next) {
   console.log('Request: ' + JSON.stringify(req.query))
-  var userId = req.session.userId || req.headers.token
+  var userId = req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page!' })
   }
@@ -103,7 +103,7 @@ tasksRouter.get('/', function (req, res, next) {
 })
 
 tasksRouter.delete('/:id', function (req, res, next) {
-  var userId = req.session.userId || req.headers.token
+  var userId = req.headers.token
   if (userId === null || userId === 'null' || userId === '') {
     return res.status(401).json({ error: 'Please log in to see this page' })
   }

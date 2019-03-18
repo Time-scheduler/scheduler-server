@@ -1,0 +1,16 @@
+[Unit]
+Description=Scheduler API
+
+[Service]
+ExecStart=/home/osu/scheduler/scheduler-server/src/index.js
+Restart=always
+User=nobody
+# Note Debian/Ubuntu uses 'nogroup', RHEL/Fedora uses 'nobody'
+Group=nogroup
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/home/osu/scheduler/scheduler-server
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const express = require('express')
 const app = express()
 const path = require('path')
@@ -9,7 +10,6 @@ var mongoose = require('mongoose')
 var session = require('express-session')
 var MongoStore = require('connect-mongo')(session)
 var bodyParser = require('body-parser')
-var CircularJSON = require('circular-json')
 
 // connect to MongoDB
 mongoose.connect('mongodb://localhost/scheduler-users')

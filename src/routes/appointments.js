@@ -39,7 +39,7 @@ appointentsRouter.post('/create', function (req, res, next) {
           return next(error)
         }
         console.log('Inserted: ', doc)
-        return res.status(201).end()
+        return res.status(201).json(doc)
       })
     })
 })
@@ -90,7 +90,7 @@ appointentsRouter.get('/', function (req, res, next) {
       var week = parseInt(req.query.week)
       var year = parseInt(req.query.year)
 
-      Task.find({ year: year, week: week }, function (error, tasks) {
+      Task.find({ userId: userId, year: year, week: week }, function (error, tasks) {
         if (error) {
           return next(error)
         }
@@ -142,7 +142,7 @@ appointentsRouter.delete('/:id', function (req, res, next) {
           if (error) {
             return next(error)
           }
-          return res.status(204).end()
+          return res.status(201).json({appointmentIds: id})
         })
       })
     })

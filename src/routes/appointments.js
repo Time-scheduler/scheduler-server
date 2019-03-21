@@ -142,7 +142,7 @@ appointentsRouter.delete('/:id', function (req, res, next) {
           if (error) {
             return next(error)
           }
-          return res.status(201).json({appointmentIds: id})
+          return res.status(201).json({ appointmentIds: id })
         })
       })
     })
